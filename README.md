@@ -40,7 +40,7 @@ The setup includes:
 2. **Clone the Repository**:
 
    ```sh
-   git clone https://github.com/yourusername/n8n-supabase-pi.git
+   git clone https://github.com/TenovanDigital/n8n-supabase-pi.git
    cd n8n-supabase-pi
    ```
 
@@ -72,6 +72,7 @@ The setup includes:
 ## Accessing Services
 
 - **n8n**: Once the setup is complete, n8n can be accessed at `http://<your-ip>:5678` or at the configured subdomain and domain.
+- **Supabase**: For database management, access Supabase at `http://<your-ip>:8000`.
 - **Portainer**: For Docker management, access Portainer at `http://<your-ip>:9000`.
 
 ## Troubleshooting
