@@ -26,10 +26,8 @@ fi
 if systemctl is-active --quiet fail2ban; then
   echo "Fail2Ban is running."
 else
-  echo "Fail2Ban is not running. Please install and start Fail2Ban by running:
-  sudo apt-get install -y fail2ban
-  sudo systemctl enable fail2ban
-  sudo systemctl start fail2ban
+  echo "Fail2Ban is not running. Please install and start by following this guide:
+  Instructions: https://pimylifeup.com/raspberry-pi-fail2ban/
 Then, reboot the system to run the script again." >&2
   exit 1
 fi
@@ -40,7 +38,8 @@ if command -v ufw > /dev/null 2>&1 && sudo ufw status | grep -q "Status: active"
 else
   echo "UFW is not properly installed or not active. Please install and enable UFW by running:
   sudo apt-get install -y ufw
-  sudo ufw allow OpenSSH
+  sudo ufw allow ssh
+  sudo ufw allow 5678
   sudo ufw enable
 Then, reboot the system to run the script again." >&2
   exit 1
@@ -75,7 +74,8 @@ loginctl enable-linger $USER
 rpi-connect signin
 
 # Pause to allow user to link the Raspberry Pi device to the Connect account
-read -p "Please complete the Raspberry Pi Connect setup by following the instructions above and press [Enter] when done."
+read -p "
+Please complete the Raspberry Pi Connect setup by following the instructions above and press [Enter] when done."
 
 # Install Portainer (our Web interface for Docker management)
 sudo docker pull portainer/portainer-ce:latest
@@ -94,14 +94,17 @@ echo "The local IP address of this device is: $LOCAL_IP"
 echo "The global IP address of this device is: $GLOBAL_IP"
 
 # Pause to allow user to complete Portainer account setup
-read -p "Please complete the Portainer account setup by visiting http://$LOCAL_IP:9000. For more information, refer to the account setup instructions here: https://pimylifeup.com/raspberry-pi-portainer/. Press [Enter] when done."
+read -p "
+Please complete the Portainer account setup by visiting http://$LOCAL_IP:9000. For more information, refer to the account setup instructions here: https://pimylifeup.com/raspberry-pi-portainer/. Press [Enter] when done."
 
 # Instructions for updating the .env file
-echo "Next, you need to update the .env file with the required environment variables. Use the following guides for reference:
+echo "
+Next, you need to update the .env file with the required environment variables. Use the following guides for reference:
 - Supabase Guide: https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/
 - n8n Guide: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file
 
-To save changes in nano, press CTRL + X, then Y to confirm saving, and Enter to finalize."
+To save changes in nano, press CTRL + X, then Y to confirm saving, and Enter to finalize.
+"
 
 # Pause to ensure the user has read the instructions
 read -p "Press [Enter] to open the .env file for editing once you have read the instructions above."
@@ -110,7 +113,8 @@ read -p "Press [Enter] to open the .env file for editing once you have read the 
 nano /home/$USER/n8n-supabase-pi/.env
 
 # Prompt user to configure DNS settings for n8n
-read -p "Please ensure that you set up DNS records pointing to this global IP address ($GLOBAL_IP) for hosting n8n publicly. Refer to the DNS setup guide here: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup. Press [Enter] when done."
+read -p "
+Please ensure that you set up DNS records pointing to this global IP address ($GLOBAL_IP) for hosting n8n publicly. Refer to the DNS setup guide here: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup. Press [Enter] when done."
 
 # Secure the .env file by changing its permissions
 chmod 600 /home/$USER/n8n-supabase-pi/.env
@@ -161,13 +165,13 @@ docker volume create n8n_data
 docker volume create traefik_data
 
 # Pull Docker images as defined in the compose file
-docker-compose pull
+docker compose pull
 
 # Run Docker Compose to set up the rest of the services
-docker-compose up -d
+docker compose up -d
 
 # Verify Docker Compose services are running
-docker-compose ps
+docker compose ps
 
 # Schedule automated reboot every Sunday at 3 AM
 (crontab -l 2>/dev/null; echo "0 3 * * 0 /sbin/reboot") | crontab -

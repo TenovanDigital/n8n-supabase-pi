@@ -1,5 +1,3 @@
-version: '3.8'
-
 volumes:
   db-config:
   traefik_data:
@@ -471,6 +469,7 @@ services:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
 
   traefik:
+    container_name: traefik
     image: "traefik"
     restart: always
     command:
@@ -493,6 +492,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
   
   n8n:
+    container_name: n8n
     image: docker.n8n.io/n8nio/n8n
     restart: always
     labels:
@@ -528,5 +528,5 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
-      supabase-db:
+      db:
         condition: service_healthy

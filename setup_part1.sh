@@ -45,14 +45,29 @@ sudo systemctl start ntp
 
 # Install Fail2Ban for security
 sudo apt-get install -y fail2ban
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+# Instructions for updating the .env file
+echo "
+You need to update the jail.local file with the correct values:
+- Instructions: https://pimylifeup.com/raspberry-pi-fail2ban/
+
+To save changes in nano, press CTRL + X, then Y to confirm saving, and Enter to finalize.
+"
+
+# Pause to ensure the user has read the instructions
+read -p "Press [Enter] to open the .env file for editing once you have read the instructions above."
+
+# Open the jail.local file for the user to update
+sudo nano /etc/fail2ban/jail.local
+
+sudo service fail2ban restart
 
 # Install Uncomplicated Firewall (UFW) and enable it
 sudo apt-get install -y ufw
-sudo ufw allow OpenSSH
+sudo ufw allow ssh
 # Allow port 5678 for n8n webhook access
-sudo ufw allow 5678/tcp
+sudo ufw allow 5678
 sudo ufw enable
 
 # # Install Memcached for caching Azure Key Vault secrets
