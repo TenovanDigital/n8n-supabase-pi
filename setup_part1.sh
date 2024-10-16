@@ -68,6 +68,11 @@ sudo apt-get install -y ufw
 sudo ufw allow ssh
 # Allow port 5678 for n8n webhook access
 sudo ufw allow 5678
+# Allow ports 80 and 443 for traefik
+sudo ufw allow 80
+sudo ufw allow 443
+# # Allow port for Supabase API?
+# sudo ufw allow 5432
 sudo ufw enable
 
 # # Install Memcached for caching Azure Key Vault secrets
