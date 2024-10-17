@@ -112,12 +112,22 @@ read -p "Press [Enter] to open the .env file for editing once you have read the 
 # Open the .env file for the user to update with required environment variables
 nano /home/$USER/n8n-supabase-pi/.env
 
+# Secure the .env file by changing its permissions
+chmod 600 /home/$USER/n8n-supabase-pi/.env
+
 # Prompt user to configure DNS settings for n8n
 read -p "
 Please ensure that you set up DNS records pointing to this global IP address ($GLOBAL_IP) for hosting n8n publicly. Refer to the DNS setup guide here: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup. Press [Enter] when done."
 
-# Secure the .env file by changing its permissions
-chmod 600 /home/$USER/n8n-supabase-pi/.env
+# Prompt user to configure Port Forwarding settings in their router
+# Pause to prompt user to configure Port Forwarding
+echo "
+Next, you need to set up Port Forwarding in your router to allow external access to n8n and Traefik. You should forward the following ports:
+- Port 80 (HTTP)
+- Port 443 (HTTPS)
+- Port specified for n8n: ${N8N_PORT} (from the .env file)
+"
+read -p "Press [Enter] when you have set up Port Forwarding."
 
 # # Sign in to Azure to configure Key Vault
 # echo "Please sign in to Azure to configure Key Vault."

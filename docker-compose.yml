@@ -518,14 +518,14 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
-      - N8N_PORT=5678
+      - N8N_PORT=${N8N_PORT}
       - N8N_PROTOCOL=https
       - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE}
       - NODE_ENV=production
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
     ports:
-      - 5678:5678
+      - ${N8N_PORT}:${N8N_PORT}
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:

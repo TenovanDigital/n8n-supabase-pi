@@ -75,6 +75,7 @@ The setup includes:
      - [Supabase Guide](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/)
      - [n8n Guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file)
    - Configure **DNS**: Set up DNS using [this guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup)
+   - Configure **Port Forwarding**: You also need to configure port forwarding on your router. Still working out which ports to forward, so stay tuned!
 
 ## Accessing Services
 
