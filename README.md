@@ -4,6 +4,8 @@
 
 n8n-supabase-pi is a complete setup for deploying n8n and Supabase on a Raspberry Pi, creating a powerful automation and data platform. This repository contains scripts and Docker Compose files that help automate the setup and configuration process, turning your Raspberry Pi into a self-hosted automation powerhouse.
 
+This is still being tested, so use at your own risk.
+
 The setup includes:
 
 - n8n: An open-source workflow automation tool.
@@ -23,9 +25,9 @@ The setup includes:
 
 ## Prerequisites
 
-- Raspberry Pi 4 with a 64-bit Debian-based OS (Bookworm or later) installed:
+- Raspberry Pi 4 with a 64-bit Raspberry Pi OS (Bookworm or later) installed:
   - **64-bit Requirement**: A 64-bit OS is required for n8n compatibility.
-  - **OS Version Requirement**: Debian-based OS version must be "Bookworm" or later for Raspberry Pi Connect compatibility.
+  - **OS Version Requirement**: Raspberry Pi OS version must be "Bookworm" or later for Raspberry Pi Connect compatibility.
 - Basic knowledge of SSH and Linux commands.
 
 ## Installation
@@ -51,6 +53,11 @@ The setup includes:
    ./setup_part1.sh
    ```
 
+   Follow the prompts to:
+
+   - Configure **Fail2Ban**: Update the `/etc/fail2ban/jail.local` file using the following instructions:
+      - [Fail2Ban Guide](https://pimylifeup.com/raspberry-pi-fail2ban/)
+
    The system will reboot after part 1 to apply changes.
 
 4. **Run the Setup Script (Part 2)**:
@@ -74,12 +81,6 @@ The setup includes:
 - **n8n**: Once the setup is complete, n8n can be accessed at `http://<your-ip>:5678` or at the configured subdomain and domain.
 - **Supabase**: For database management, access Supabase at `http://<your-ip>:8000`.
 - **Portainer**: For Docker management, access Portainer at `http://<your-ip>:9000`.
-
-## Troubleshooting
-
-- **Docker Not Running**: Ensure the Docker service is running with `sudo systemctl status docker`. If not, restart it with `sudo systemctl restart docker`.
-- **Portainer Setup Issues**: Make sure Portainer is accessible at port 9000. If not, verify your firewall settings with `sudo ufw status`.
-- **Environment Variables**: Double-check the `.env` file for any missing or incorrect variables, which could cause services to fail.
 
 ## Contributing
 
