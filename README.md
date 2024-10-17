@@ -30,6 +30,11 @@ The setup includes:
   - **OS Version Requirement**: Raspberry Pi OS version must be "Bookworm" or later for Raspberry Pi Connect compatibility.
 - Basic knowledge of SSH and Linux commands.
 
+## Recommendations
+
+- [Argon ONE M.2 Case for Raspberry Pi 4](https://argon40.com/products/argon-one-m-2-case-for-raspberry-pi-4?srsltid=AfmBOorKZf-7TrKTBIB6T3fUDcw28vrTysTmWWpj0O1wv9lGfZ5RDPMF)
+- Storage Drive for the database (I will be using a M.2 SSD in the case)
+
 ## Installation
 
 1. **Install Git**:
@@ -55,8 +60,13 @@ The setup includes:
 
    Follow the prompts to:
 
-   - Configure **Fail2Ban**: Update the `/etc/fail2ban/jail.local` file using the following instructions:
+   - Install **ArgonOne Case Script** (Optional)
+   - Configure **Fail2Ban** (Optional): Configure Fail2Ban following these instructions:
       - [Fail2Ban Guide](https://pimylifeup.com/raspberry-pi-fail2ban/)
+   - Mount **Database Drive** (Optional)
+   - Configure **Environment Variables**: Update the `.env` file using the following resources:
+      - [Supabase Guide](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/)
+      - [n8n Guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file)
 
    The system will reboot after part 1 to apply changes.
 
@@ -71,9 +81,6 @@ The setup includes:
 
    - Set up **Raspberry Pi Connect**: Create a Raspberry Pi ID to link the device by visiting [Raspberry Pi ID](https://id.raspberrypi.com/).
    - Set up **Portainer**: Follow the setup instructions in [this guide](https://pimylifeup.com/raspberry-pi-portainer/).
-   - Configure **environment variables**: Update the `.env` file using the following resources:
-     - [Supabase Guide](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/)
-     - [n8n Guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file)
    - Configure **DNS**: Set up DNS using [this guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup)
    - Configure **Port Forwarding**: You also need to configure port forwarding on your router. Still working out which ports to forward, so stay tuned!
 

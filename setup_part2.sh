@@ -67,14 +67,11 @@ Then, reboot the system to run the script again." >&2
   exit 1
 fi
 
-# Enable user-lingering for Raspberry Pi Connect to auto-run each reboot
-loginctl enable-linger $USER
-
 # Now we need to link our Raspberry Pi device with a Connect Account
 rpi-connect signin
 
 # Pause to allow user to link the Raspberry Pi device to the Connect account
-read -p "
+read -p "*******************************************************************************
 Please complete the Raspberry Pi Connect setup by following the instructions above and press [Enter] when done."
 
 # Install Portainer (our Web interface for Docker management)
@@ -94,40 +91,24 @@ echo "The local IP address of this device is: $LOCAL_IP"
 echo "The global IP address of this device is: $GLOBAL_IP"
 
 # Pause to allow user to complete Portainer account setup
-read -p "
+read -p "*******************************************************************************
 Please complete the Portainer account setup by visiting http://$LOCAL_IP:9000. For more information, refer to the account setup instructions here: https://pimylifeup.com/raspberry-pi-portainer/. Press [Enter] when done."
 
-# Instructions for updating the .env file
-echo "
-Next, you need to update the .env file with the required environment variables. Use the following guides for reference:
-- Supabase Guide: https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/
-- n8n Guide: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file
-
-To save changes in nano, press CTRL + X, then Y to confirm saving, and Enter to finalize.
-"
-
-# Pause to ensure the user has read the instructions
-read -p "Press [Enter] to open the .env file for editing once you have read the instructions above."
-
-# Open the .env file for the user to update with required environment variables
-nano /home/$USER/n8n-supabase-pi/.env
-
-# Secure the .env file by changing its permissions
-chmod 600 /home/$USER/n8n-supabase-pi/.env
-
 # Prompt user to configure DNS settings for n8n
-read -p "
+read -p "*******************************************************************************
 Please ensure that you set up DNS records pointing to this global IP address ($GLOBAL_IP) for hosting n8n publicly. Refer to the DNS setup guide here: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#4-dns-setup. Press [Enter] when done."
 
 # Prompt user to configure Port Forwarding settings in their router
 # Pause to prompt user to configure Port Forwarding
+N8N_PORT=$(awk -F= '$1 == "N8N_PORT" {print $2}' .env)
 echo "
 Next, you need to set up Port Forwarding in your router to allow external access to n8n and Traefik. You should forward the following ports:
 - Port 80 (HTTP)
 - Port 443 (HTTPS)
-- Port specified for n8n: ${N8N_PORT} (from the .env file)
+- Port ${N8N_PORT:-5678} (n8n)
 "
-read -p "Press [Enter] when you have set up Port Forwarding."
+read -p "*******************************************************************************
+Press [Enter] when you have set up Port Forwarding."
 
 # # Sign in to Azure to configure Key Vault
 # echo "Please sign in to Azure to configure Key Vault."
@@ -170,10 +151,6 @@ read -p "Press [Enter] when you have set up Port Forwarding."
 # Navigate to the repository directory
 cd /home/$USER/n8n-supabase-pi
 
-# Create Docker volume folders
-docker volume create n8n_data
-docker volume create traefik_data
-
 # Pull Docker images as defined in the compose file
 docker compose pull
 
@@ -185,6 +162,9 @@ docker compose ps
 
 # Schedule automated reboot every Sunday at 3 AM
 (crontab -l 2>/dev/null; echo "0 3 * * 0 /sbin/reboot") | crontab -
+
+# Import n8n AI-Agent Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
+docker exec -u node -it n8n n8n import:workflow --input=My_workflow.json
 
 # Log setup completion
 echo "Setup Part 2 complete. Services started successfully." >> /home/$USER/setup_log.txt
