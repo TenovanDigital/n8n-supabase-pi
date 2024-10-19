@@ -55,6 +55,7 @@ The setup includes:
    Execute the first setup script to install all necessary dependencies and reboot the Raspberry Pi:
 
    ```sh
+   chmod +x setup_part1.sh
    ./setup_part1.sh
    ```
 
@@ -74,6 +75,7 @@ The setup includes:
    After reboot, manually run the second setup script to complete the installation:
 
    ```sh
+   chmod +x setup_part2.sh
    ./setup_part2.sh
    ```
 
