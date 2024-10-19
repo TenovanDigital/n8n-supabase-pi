@@ -15,7 +15,7 @@ if [ "$granted_scripts_permissions" != "True" ]; then
 fi
 
 # Configure setup
-./scripts/configure_setup.sh
+. /home/$USER/n8n-supabase-pi/scripts/configure_setup.sh
 
 # Mark granting script permissions as completed
 if [ "$granted_scripts_permissions" != "True" ]; then
@@ -28,7 +28,7 @@ fi
 # curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Configure .env file
-./scripts/configure_env.sh
+. /home/$USER/n8n-supabase-pi/scripts/configure_env.sh
 
 echo "Commencing with Setup Part 1..."
 
@@ -37,33 +37,33 @@ sudo apt update && sudo apt full-upgrade -y
 
 # Install Argon One PI 4 V2 Power Button & Fan Control
 if [ "$install_argon_one" == "True" ]; then
-  ./scripts/install_argon_one.sh
+  . /home/$USER/n8n-supabase-pi/scripts/install_argon_one.sh
 fi
 
 # Install Raspberry Pi Connect
 if [ "$install_rpi_connect" == "True" ]; then
-  ./scripts/install_rpi_connect.sh
+  . /home/$USER/n8n-supabase-pi/scripts/install_rpi_connect.sh
 fi
 
 # Install Docker
-./scripts/install_docker.sh
+. /home/$USER/n8n-supabase-pi/scripts/install_docker.sh
 
 # Install Network Time Protocol (NTP)
-./scripts/install_ntp.sh
+. /home/$USER/n8n-supabase-pi/scripts/install_ntp.sh
 
 # Install Fail2Ban
 if [ "$install_fail2ban" == "True" ]; then
-  ./scripts/install_fail2ban.sh
+  . /home/$USER/n8n-supabase-pi/scripts/install_fail2ban.sh
 fi
 
 # Install Uncomplicated Firewall (UFW)
 if [ "$install_ufw" == "True" ]; then
-  ./scripts/install_ufw.sh
+  . /home/$USER/n8n-supabase-pi/scripts/install_ufw.sh
 fi
 
 # Mount Database Drive
 if [ "$mount_database_drive" == "True" ]; then
-  ./scripts/mount_database_drive.sh
+  . /home/$USER/n8n-supabase-pi/scripts/mount_database_drive.sh
 fi
 
 if [ "$completed_setup_part_1" != "True" ]; then

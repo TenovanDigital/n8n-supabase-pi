@@ -9,6 +9,8 @@ if [[ -f "$CONFIG_FILE" ]]; then
 fi
 
 if [ "$installed_ufw" == "True" ]; then
+  echo "Enabling UFW..."
+
   # Enable UFW
   sudo ufw enable
 

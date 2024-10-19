@@ -18,6 +18,8 @@ elif [ "$installed_docker" != "True" ]; then
   echo "ERROR: Can't intialize services because Docker isn't installed. Install Docker and try again."
   exit 1
 else
+  echo "Initializing services..."
+
   # Navigate to the repository directory
   cd /home/$USER/n8n-supabase-pi
 

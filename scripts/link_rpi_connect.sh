@@ -11,15 +11,10 @@ fi
 if [ "$linked_rpi_connect" == "True" ]; then
   echo "Raspberry Pi Connect is already linked."
 elif [ "$installed_rpi_connect" == "True" ]; then
+  echo "Link to Raspberry Pi Connect"
+
   # Link our Raspberry Pi device with a Connect Account
   rpi-connect signin
-
-  # Pause to allow user to link the Raspberry Pi device to the Connect account
-  read -p "*******************************************************************************
-  Please complete the Raspberry Pi Connect setup by following the instructions above and press [Enter] when done."
-
-  # TO-DO: Verify the "logged in" status
-  rpi-connect status
 
   # Update the setup.conf file
   sed -i '/^linked_rpi_connect=/d' "$CONFIG_FILE"

@@ -69,9 +69,9 @@ else
       sudo mkfs.ext4 "$database_drive"
       database_drive_type="ext4"
     elif [ "$install_ntfs" == "True" ]; then
-      ./scripts/install_ntfs.sh
+      . /home/$USER/n8n-supabase-pi/scripts/install_ntfs.sh
     elif [ "$install_exfat" == "True" ]; then
-      ./scripts/install_exfat.sh
+      . /home/$USER/n8n-supabase-pi/scripts/install_exfat.sh
     fi
 
     # Guide for mounting a drive: https://pimylifeup.com/raspberry-pi-mount-usb-drive/

@@ -13,7 +13,7 @@ if [ "$configured_port_forwarding" == "True" ]; then
 else
   # Prompt user to configure Port Forwarding settings in their router
   # Pause to prompt user to configure Port Forwarding
-  N8N_PORT=$(awk -F= '$1 == "N8N_PORT" {print $2}' ../.env)
+  N8N_PORT=$(awk -F= '$1 == "N8N_PORT" {print $2}' /home/$USER/n8n-supabase-pi/.env)
   echo "
   Next, you need to set up Port Forwarding in your router to allow external access to n8n and Traefik. You should forward the following ports:
   - Port 80 (HTTP)

@@ -25,7 +25,10 @@ elif [ "$initialized_services" != "True" ]; then
   echo "ERROR: Can't import n8n workflows because the n8n service hasn't been initialized. Initialize services and try again."
   exit 1
 else
+  # TODO: Check if the n8n instance is currently healthy
+
   # Import n8n default Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
+  # TODO: This didn't work. It couldn't seem to find the json file...
   docker exec -u node -it n8n n8n import:workflow --input=My_workflow.json
 
   # Update the setup.conf file

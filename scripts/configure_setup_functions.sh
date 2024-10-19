@@ -153,7 +153,7 @@ prompt_drive() {
         read -r confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
           # Write user's choice and drive to the config file
-          write_choice "$service_name" "$choice"
+          write_choice "$config_name" "$choice"
           write_config "$drive_name" "$target_drive"
           write_config "$uuid_name" "$drive_uuid"
           write_config "$type_name" "$drive_type"
@@ -161,7 +161,7 @@ prompt_drive() {
         fi
       elif [[ "$choice" =~ ^[Nn]$ ]]; then
         # Write user's choice to the config file
-        write_choice "$service_name" "$choice"
+        write_choice "$config_name" "$choice"
         break
       else
         echo "Invalid input. Please enter 'y' or 'n'."

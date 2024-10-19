@@ -26,45 +26,45 @@ echo "Commencing with Setup Part 2..."
 
 # Link Raspberry Pi device with a Connect Account
 if [ "$install_rpi_connect" == "True" ]; then
-  ./scripts/link_rpi_connect.sh
+  . /home/$USER/n8n-supabase-pi/scripts/link_rpi_connect.sh
 fi
 
 # Verify Docker installation and that the user has been added to docker group
-./scripts/verify_docker.sh
+. /home/$USER/n8n-supabase-pi/scripts/verify_docker.sh
 
 # Install Portainer (our Web interface for Docker management)
 if [ "$install_portainer" == "True" ]; then
-  ./scripts/install_portainer.sh
+  . /home/$USER/n8n-supabase-pi/scripts/install_portainer.sh
 fi
 
 # Configure DNS settings for n8n
-./scripts/configure_dns.sh
+. /home/$USER/n8n-supabase-pi/scripts/configure_dns.sh
 
 # Configure Port Forwarding in router
-./scripts/configure_port_forwarding.sh
+. /home/$USER/n8n-supabase-pi/scripts/configure_port_forwarding.sh
 
 # Verify NTP installation and status
-./scripts/verify_ntp.sh
+. /home/$USER/n8n-supabase-pi/scripts/verify_ntp.sh
 
 # Verify Fail2Ban installation and status
 if [ "$install_fail2ban" == "True" ]; then
-  ./scripts/verify_fail2ban.sh
+  . /home/$USER/n8n-supabase-pi/scripts/verify_fail2ban.sh
 fi
 
 # Verify UFW installation
 if [ "$install_ufw" == "True" ]; then
-  ./scripts/verify_ufw.sh
+  . /home/$USER/n8n-supabase-pi/scripts/verify_ufw.sh
 fi
 
 # Initialize Services
-./scripts/initialize_services.sh
+. /home/$USER/n8n-supabase-pi/scripts/initialize_services.sh
 
 # Schedule automated reboot every Sunday at 3 AM
-./scripts/schedule_weekly_reboot.sh
+. /home/$USER/n8n-supabase-pi/scripts/schedule_weekly_reboot.sh
 
 # Import n8n default Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
 if [ "$import_n8n_workflows" == "True" ]; then
-  ./scripts/import_n8n_workflows.sh
+  . /home/$USER/n8n-supabase-pi/scripts/import_n8n_workflows.sh
 fi
 
 if [ "$completed_setup_part_2" != "True" ]; then
