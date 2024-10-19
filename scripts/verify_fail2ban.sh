@@ -8,11 +8,14 @@ if [[ -f "$CONFIG_FILE" ]]; then
   source "$CONFIG_FILE"
 fi
 
-if systemctl is-active --quiet fail2ban; then
-  echo "Fail2Ban is running."
+if [ "$installed_fail2ban" == "True" ]; then
+  if systemctl is-active --quiet fail2ban; then
+    echo "Fail2Ban is running."
+  else
+    echo "Fail2Ban is not running. Please ensure Fail2Ban is properly installed and try again."
+    exit 1
+  fi
 else
-  echo "Fail2Ban is not running. Please install and start by following this guide:
-  Instructions: https://pimylifeup.com/raspberry-pi-fail2ban/
-Then, reboot the system to run the script again." >&2
+  echo "ERROR: Can't verify Fail2Ban because it isn't installed. Install Fail2Ban and try again."
   exit 1
 fi

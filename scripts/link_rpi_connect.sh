@@ -24,10 +24,14 @@ elif [ "$installed_rpi_connect" == "True" ]; then
   # Update the setup.conf file
   sed -i '/^linked_rpi_connect=/d' "$CONFIG_FILE"
   echo "linked_rpi_connect=True" >> "$CONFIG_FILE"
+
+  # Confirmation message
+  echo "Raspberry Pi Connect has been linked successfully."
 else
   # Update the setup.conf file
   sed -i '/^linked_rpi_connect=/d' "$CONFIG_FILE"
   echo "linked_rpi_connect=False" >> "$CONFIG_FILE"
 
   echo "ERROR: Can't link Raspberry Pi Connect because it isn't installed. Install Raspberry Pi Connect and try again."
+  exit 1
 fi

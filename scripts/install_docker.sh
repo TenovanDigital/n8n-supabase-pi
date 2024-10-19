@@ -3,12 +3,24 @@
 # Define the configuration file path
 CONFIG_FILE="/home/$USER/n8n-supabase-pi/setup.conf"
 
-# Install Docker
-curl -sSL https://get.docker.com | sh
+# Load setup configuration from the file
+if [[ -f "$CONFIG_FILE" ]]; then
+  source "$CONFIG_FILE"
+fi
 
-# Add your user to the "docker" group
-sudo usermod -aG docker $USER
+if [ "$installed_docker" == "True" ]; then
+  echo "Docker is already installed."
+else
+  # Install Docker
+  curl -sSL https://get.docker.com | sh
 
-# Update the setup.conf file
-sed -i '/^installed_docker=/d' "$CONFIG_FILE"
-echo "installed_docker=True" >> "$CONFIG_FILE"
+  # Add your user to the "docker" group
+  sudo usermod -aG docker $USER
+
+  # Update the setup.conf file
+  sed -i '/^installed_docker=/d' "$CONFIG_FILE"
+  echo "installed_docker=True" >> "$CONFIG_FILE"
+
+  # Confirmation message
+  echo "Docker has been installed successfully."
+fi

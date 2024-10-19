@@ -29,76 +29,49 @@ if [ "$install_rpi_connect" == "True" ]; then
   ./scripts/link_rpi_connect.sh
 fi
 
+# Verify Docker installation and that the user has been added to docker group
+./scripts/verify_docker.sh
+
 # Install Portainer (our Web interface for Docker management)
 if [ "$install_portainer" == "True" ]; then
   ./scripts/install_portainer.sh
 fi
 
 # Configure DNS settings for n8n
-if [ "$configured_dns" != "True" ]; then
-  ./scripts/configure_dns.sh
-fi
+./scripts/configure_dns.sh
 
 # Configure Port Forwarding in router
-if [ "$configured_port_forwarding" != "True" ]; then
-  ./scripts/configure_port_forwarding.sh
-fi
-
-# Verify Docker installation and that the user has been added to docker group
-if [ "$verified_docker" != "True" ]; then
-  ./scripts/verify_docker.sh
-fi
+./scripts/configure_port_forwarding.sh
 
 # Verify NTP installation and status
-if [ "$verified_ntp" != "True" ]; then
-  ./scripts/verify_ntp.sh
-fi
+./scripts/verify_ntp.sh
 
 # Verify Fail2Ban installation and status
-if [ "$install_fail2ban" == "True" ] && [ "$verified_fail2ban" != "True" ]; then
+if [ "$install_fail2ban" == "True" ]; then
   ./scripts/verify_fail2ban.sh
 fi
 
 # Verify UFW installation
-if [ "$install_ufw" == "True" ] && [ "$verified_ufw" != "True" ]; then
+if [ "$install_ufw" == "True" ]; then
   ./scripts/verify_ufw.sh
 fi
 
-if [ "$initialized_docker_compose" != "True" ]; then
-  # Navigate to the repository directory
-  cd /home/$USER/n8n-supabase-pi
-
-  # Pull Docker images as defined in the compose file
-  docker compose pull
-
-  # Run Docker Compose to set up the rest of the services
-  docker compose up -d
-
-  # Verify Docker Compose services are running
-  docker compose ps
-
-  # Update the setup.conf file
-  sed -i '/^initialized_docker_compose=/d' "$CONFIG_FILE"
-  echo "initialized_docker_compose=True" >> "$CONFIG_FILE"
-fi
+# Initialize Services
+./scripts/initialize_services.sh
 
 # Schedule automated reboot every Sunday at 3 AM
-if [ "$scheduled_weekly_reboot" != "True" ]; then
-  (crontab -l 2>/dev/null; echo "0 3 * * 0 /sbin/reboot") | crontab -
+./scripts/schedule_weekly_reboot.sh
 
-  # Update the setup.conf file
-  sed -i '/^scheduled_weekly_reboot=/d' "$CONFIG_FILE"
-  echo "scheduled_weekly_reboot=True" >> "$CONFIG_FILE"
+# Import n8n default Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
+if [ "$import_n8n_workflows" == "True" ]; then
+  ./scripts/import_n8n_workflows.sh
 fi
 
-# Import n8n AI-Agent Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
-if [ "$imported_n8n_workflows" != "True" ]; then
-  docker exec -u node -it n8n n8n import:workflow --input=My_workflow.json
-
+if [ "$completed_setup_part_2" != "True" ]; then
   # Update the setup.conf file
-  sed -i '/^imported_n8n_workflows=/d' "$CONFIG_FILE"
-  echo "imported_n8n_workflows=True" >> "$CONFIG_FILE"
+  sed -i '/^completed_setup_part_2=/d' "$CONFIG_FILE"
+  echo "completed_setup_part_2=True" >> "$CONFIG_FILE"
 fi
 
 # Log setup completion
-echo "Setup Part 2 complete. Services started successfully." >> /home/$USER/setup_log.txt
+echo "Setup Part 2 complete. Services started successfully."

@@ -8,18 +8,17 @@ if [[ -f "$CONFIG_FILE" ]]; then
   source "$CONFIG_FILE"
 fi
 
-## CHANGE THIS. UFW ISN'T ENABLED, YET!
-if command -v ufw > /dev/null 2>&1 && sudo ufw status | grep -q "Status: active"; then
-  echo "UFW is installed and active."
-
+if [ "$installed_ufw" == "True" ]; then
   # Enable UFW
   sudo ufw enable
+
+  if command -v ufw > /dev/null 2>&1 && sudo ufw status | grep -q "Status: active"; then
+    echo "UFW is installed and active."
+  else
+    echo "UFW is not properly installed or not active. Please install and enable UFW and try again."
+    exit 1
+  fi
 else
-  echo "UFW is not properly installed or not active. Please install and enable UFW by running:
-  sudo apt-get install -y ufw
-  sudo ufw allow ssh
-  sudo ufw allow 5678
-  sudo ufw enable
-Then, reboot the system to run the script again." >&2
+  echo "ERROR: Can't verify UFW because it isn't installed. Install UFW and try again."
   exit 1
 fi

@@ -30,10 +30,14 @@ elif [ "$installed_docker" == "True" ]; then
   # Update the setup.conf file
   sed -i '/^installed_portainer=/d' "$CONFIG_FILE"
   echo "installed_portainer=True" >> "$CONFIG_FILE"
+
+  # Confirmation message
+  echo "Portainer has been installed successfully."
 else
   # Update the setup.conf file
   sed -i '/^installed_portainer=/d' "$CONFIG_FILE"
   echo "installed_portainer=False" >> "$CONFIG_FILE"
 
   echo "ERROR: Can't install Portainer because Docker isn't installed. Install Docker and try again."
+  exit 1
 fi
