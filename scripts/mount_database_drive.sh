@@ -11,26 +11,90 @@ fi
 if [ "$mounted_database_drive" == "True" ]; then
   echo "Database Drive already mounted."
 else
-  mount_database_drive() {
-    local drive="$1"
-    local uuid="$2"
+  if [ -z "$database_drive" ]; then
+    # Read in setup configuration functions
+    . /home/$USER/n8n-supabase-pi/scripts/configure_setup_functions.sh
 
-    # Format the database drive
-    echo "Formatting database drive..."
-    sudo mkfs.ext4 "$drive"
+    # Prompt user for database drive mount configuration
+    while true; do
+      prompt_drive "mount_database_drive" "database_drive" "database_drive_uuid" "database_drive_type" "Do you want to mount a separate drive for the database to use?"
+      if [ "$mount_database_drive" == "True" ]; then
+        echo "It is recommended to format the database drive to the 'ext4' format prior to mounting it."
+        echo "WARNING: This means ALL data on it will be erased!"
+        prompt_choice "format_database_drive" "Do you want to format the drive?"
+        if [ "$format_database_drive" == "False" ] && [ "$database_drive_type" == "ntfs" ]; then
+          echo "Since the drive is using the 'ntfs' format, we will need to install the NTFS-3g driver."
+          prompt_choice "install_ntfs" "Do you want to install the NTFS-3g driver?"
+          if [ "$install_ntfs" == "False" ]; then
+            echo "Without the NTFS-3g driver, this device won't be able to use this drive. Please try again."
+            sed -i "/^mount_database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive_uuid=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive_type=/d" "$CONFIG_FILE"
+            sed -i "/^format_database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^install_ntfs=/d" "$CONFIG_FILE"
+            continue
+          else
+            break
+          fi
+        elif [ "$format_database_drive" == "False" ] && [ "$database_drive_type" == "exFAT" ]; then
+          echo "Since the drive is using the 'exFAT' format, we will need to install the exFAT filesystem driver."
+          prompt_choice "install_exfat" "Do you want to install the exFAT filesystem driver?"
+          if [ "$install_exfat" == "False" ]; then
+            echo "Without the exfat filesystem driver, this device won't be able to use this drive. Please try again."
+            sed -i "/^mount_database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive_uuid=/d" "$CONFIG_FILE"
+            sed -i "/^database_drive_type=/d" "$CONFIG_FILE"
+            sed -i "/^format_database_drive=/d" "$CONFIG_FILE"
+            sed -i "/^install_exfat=/d" "$CONFIG_FILE"
+            continue
+          else
+            break
+          fi
+        else
+          break
+        fi
+      else
+        break
+      fi
+    done
+  fi
+
+  # If user didn't cancel, then mount the drive
+  if [ "$mount_database_drive" == "True" ]; then
+    if [ "$format_database_drive" == "True" ]; then
+      # Format the database drive
+      echo "Formatting database drive..."
+      sudo mkfs.ext4 "$database_drive"
+      database_drive_type="ext4"
+    elif [ "$install_ntfs" == "True" ]; then
+      ./scripts/install_ntfs.sh
+    elif [ "$install_exfat" == "True" ]; then
+      ./scripts/install_exfat.sh
+    fi
+
+    # Guide for mounting a drive: https://pimylifeup.com/raspberry-pi-mount-usb-drive/
 
     # Create the mount point
     mount_point="/home/$USER/n8n-supabase-pi/mnt/database"
     echo "Creating mount point at $mount_point"
-    mkdir -p "$mount_point"
+    sudo mkdir -p "$mount_point"
 
-    # Mount the drive
-    echo "Mounting the drive..."
-    sudo mount "$drive" "$mount_point"
+    # Give the user ownership of the mount point folder
+    echo "Giving $USER ownership of $mount_point"
+    sudo chown -R "$USER":"$USER" "$mount_point"
 
     # Persist the mount in /etc/fstab
     echo "Persisting the mount in /etc/fstab"
-    echo "UUID=$uuid $mount_point ext4 defaults 0 2" | sudo tee -a /etc/fstab
+    echo "UUID=$database_drive_uuid $mount_point $database_drive_type defaults,auto,users,rw,nofail,noatime 0 0" | sudo tee -a /etc/fstab
+
+    # If the device mounted automatically, we will need to unmount it temporarily.
+    sudo umount "$database_drive"
+
+    # Mount the drive using the /etc/fstab file
+    echo "Mounting the drive..."
+    sudo mount -a
 
     # Move existing volumes to the new mount point
     echo "Moving existing volumes to the mounted drive..."
@@ -46,56 +110,8 @@ else
 
     # Confirmation message
     echo "Drive mounted and volumes moved successfully."
-  }
-
-  if [ -z "$database_drive" ]; then
-    while true; do
-      echo "Please connect the drive you want to use and press [Enter] when ready."
-      read -r
-
-      # Inform user that the drive will be formatted
-      echo "WARNING: The selected drive will be formatted. All data on it will be lost. Please make sure you select the correct drive."
-      echo "*******************************************************************************"
-      
-      # Display available drives
-      lsblk
-
-      # Prompt user for the target drive
-      echo "*******************************************************************************"
-      echo "Enter the name of the drive without the leading '/dev/' (e.g., sba, sdb, etc.):"
-      read -r name
-
-      # Add '/dev/' prefix to the user input
-      target_drive="/dev/$name"
-
-      # Verify the user input is a valid drive
-      if lsblk | grep -q "$name"; then
-        # Get the UUID of the drive
-        drive_uuid=$(blkid -s UUID -o value "$target_drive")
-
-        if [ -z "$drive_uuid" ]; then
-          echo "ERROR: Unable to retrieve the UUID for the drive $target_drive."
-          echo "This may be due to an issue with the drive itself or a misconfiguration."
-          echo "Please make sure the drive is properly connected, unmounted, and not in use."
-          echo "Please try again."
-          continue
-        fi
-
-        echo "You selected: $target_drive"
-        echo "Drive UUID: $drive_uuid"
-        echo "WARNING: This will format $target_drive. All data on it will be erased!"
-        echo "Please confirm: Is this the correct drive? (y/n)"
-        read -r confirm
-        if [[ "$confirm" =~ ^[Yy]$ ]]; then
-          mount_database_drive "$target_drive" "$drive_uuid"
-          break
-        fi
-      else
-        echo "Invalid drive selected. Please try again."
-        continue
-      fi
-    done
   else
-    mount_database_drive "$database_drive" "$database_drive_uuid"
+    # Cancellation message
+    echo "Cancelled mounting database drive."
   fi
 fi
