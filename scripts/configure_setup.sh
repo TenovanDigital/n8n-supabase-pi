@@ -126,7 +126,7 @@ else
     # Check if the configuration value was already decided
     eval config_value=\$$config_name
     eval drive_value=\$$drive_name
-    if [ -z "$config_value" $$ -z "$drive_value"]; then
+    if [ -z "$config_value" ] && [ -z "$drive_value" ]; then
       while true; do
         echo "$prompt_message (y/n)"
         read -r choice
@@ -231,9 +231,11 @@ else
     elif [[ "$confirm" =~ ^[Nn]$ ]]; then
       # Clear the config file and prompt user again
       > "$CONFIG_FILE"
+      source "$CONFIG_FILE"
+
+      # Start over
       echo "Configuration file cleared. Restarting the setup..."
       prompt_all_services
-      break
     else
       echo "Invalid input. Please enter 'y' or 'n'."
     fi
