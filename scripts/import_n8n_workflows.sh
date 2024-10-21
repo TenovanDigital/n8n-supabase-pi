@@ -24,7 +24,7 @@ elif [ "$initialized_services" != "True" ]; then
 
   echo "ERROR: Can't import n8n workflows because the n8n service hasn't been initialized. Initialize services and try again."
   exit 1
-elif [ -z `docker-compose ps -q n8n` ] || [ -z `docker ps -q --no-trunc | grep $(docker-compose ps -q n8n)` ]; then
+elif [ -z `docker compose ps -q n8n` ] || [ -z `docker ps -q --no-trunc | grep $(docker compose ps -q n8n)` ]; then
   # Update the setup.conf file
   sed -i '/^imported_n8n_workflows=/d' "$CONFIG_FILE"
   echo "imported_n8n_workflows=False" >> "$CONFIG_FILE"
@@ -32,6 +32,8 @@ elif [ -z `docker-compose ps -q n8n` ] || [ -z `docker ps -q --no-trunc | grep $
   echo "ERROR: Can't import n8n workflows because the n8n service isn't running. N8n may still be starting up or it may have run into an error. Please check the n8n container and try again."
   exit 1
 else
+  # If n8n can't find your file, try this: https://community.n8n.io/t/importing-workflows-and-credentials/45142
+
   # Import n8n default Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
   docker exec -u node -it n8n n8n import:workflow --input=/mnt/n8n/My_workflow.json
 

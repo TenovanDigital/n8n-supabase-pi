@@ -48,6 +48,12 @@ else
   # Install Fail2Ban for security
   sudo apt-get install -y fail2ban
 
+  # Install logging dependency
+  # https://www.reddit.com/r/debian/comments/1awfi1e/please_help_me_getting_fail2ban_working_on_my/
+  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=770171
+  # https://github.com/fail2ban/fail2ban/issues/3292
+  sudo apt-get install python3_systemd
+
   # Copy default configuration to local configuration
   sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
@@ -58,6 +64,9 @@ else
     /^\[sshd\]/ {print; print "enabled = true\nfilter = sshd\nbanaction = iptables-multiport\nbantime = " bantime "\nmaxretry = " maxretry; insert=1; next}
     {if (insert && /^[^\[]/) insert=0; if (!insert) print}
   ' /etc/fail2ban/jail.local | sudo tee /etc/fail2ban/jail.local.tmp && sudo mv /etc/fail2ban/jail.local.tmp /etc/fail2ban/jail.local
+
+  # Change the backend to use systemd
+  sudo sed -i 's/^backend = %(sshd_backend)s$/backend = systemd/' /etc/fail2ban/jail.local
 
   # Restart Fail2Ban service to apply the changes
   sudo service fail2ban restart

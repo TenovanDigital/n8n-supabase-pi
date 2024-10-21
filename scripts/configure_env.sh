@@ -56,10 +56,10 @@ else
   # - n8n: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file
   echo ""
   echo "[Supabase]"
-  prompt_env_var "POSTGRES_PASSWORD" "Should be at least 32 characters long with no special characters" "Enter the PostgreSQL password"
+  prompt_env_var "POSTGRES_PASSWORD_NEW" "Should be at least 32 characters long with no special characters" "Enter the PostgreSQL password"
   prompt_env_var "JWT_SECRET" "Should be at least 32 characters long with no special characters. Hold onto this one to generate next secrets." "Enter the JWT secret"
-  prompt_env_var "ANON_KEY" "Use the JWT_SECRET to generate this anon key using the form here: https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/" "Enter the anonymous key"
-  prompt_env_var "SERVICE_KEY" "Use the JWT_SECRET to generate this service key using the form here: https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/" "Enter the service key"
+  prompt_env_var "ANON_KEY" "Use the JWT_SECRET to generate this anon key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the anonymous key"
+  prompt_env_var "SERVICE_KEY" "Use the JWT_SECRET to generate this service key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the service key"
   prompt_env_var "DASHBOARD_USERNAME" "Credential for you to log into Supabase" "Enter username"
   prompt_env_var "DASHBOARD_PASSWORD" "Credential for you to log into Supabase" "Enter password"
   echo ""
