@@ -529,6 +529,7 @@ services:
       - ${N8N_PORT}:${N8N_PORT}
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./volumes/n8n/My_workflow.json:/mnt/n8n/My_workflow.json
     depends_on:
       db:
         condition: service_healthy

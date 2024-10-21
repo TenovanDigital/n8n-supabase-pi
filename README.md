@@ -41,6 +41,9 @@ The setup includes:
 
    ```sh
    sudo apt-get update
+   ```
+
+   ```sh
    sudo apt-get install git -y
    ```
 
@@ -48,6 +51,9 @@ The setup includes:
 
    ```sh
    git clone https://github.com/TenovanDigital/n8n-supabase-pi.git
+   ```
+
+   ```sh
    cd n8n-supabase-pi
    ```
 
@@ -56,6 +62,9 @@ The setup includes:
 
    ```sh
    chmod +x setup_part1.sh
+   ```
+
+   ```sh
    ./setup_part1.sh
    ```
 
@@ -69,13 +78,12 @@ The setup includes:
       - [Supabase Guide](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services/)
       - [n8n Guide](https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file)
 
-   The system will reboot after part 1 to apply changes.
+   You will need to reboot the system before running the Setup Part 2 script.
 
 4. **Run the Setup Script (Part 2)**:
    After reboot, manually run the second setup script to complete the installation:
 
    ```sh
-   chmod +x setup_part2.sh
    ./setup_part2.sh
    ```
 
