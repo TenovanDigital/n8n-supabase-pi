@@ -62,14 +62,6 @@ fi
 # Schedule automated reboot every Sunday at 3 AM
 . /home/$USER/n8n-supabase-pi/scripts/schedule_weekly_reboot.sh
 
-# Change the Postgres Password
-. /home/$USER/n8n-supabase-pi/scripts/change_postgres_password.sh
-
-# Import n8n default Workflows (See https://docs.n8n.io/hosting/cli-commands/#workflows_1)
-if [ "$import_n8n_workflows" == "True" ]; then
-  . /home/$USER/n8n-supabase-pi/scripts/import_n8n_workflows.sh
-fi
-
 if [ "$completed_setup_part_2" != "True" ]; then
   # Update the setup.conf file
   sed -i '/^completed_setup_part_2=/d' "$CONFIG_FILE"

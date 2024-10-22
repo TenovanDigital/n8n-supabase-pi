@@ -50,6 +50,7 @@ else
     exit 1
   fi
 
+  # Execute the SQL commands inside the Docker container
   docker exec -i $CONTAINER_NAME psql -h 127.0.0.1 -p 5432 -d postgres -U supabase_admin << EOT
     alter user anon with password '$new_passwd';
     alter user authenticated with password '$new_passwd';

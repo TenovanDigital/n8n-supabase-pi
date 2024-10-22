@@ -84,6 +84,10 @@ The setup includes:
    After reboot, manually run the second setup script to complete the installation:
 
    ```sh
+   cd n8n-supabase-pi
+   ```
+   
+   ```sh
    ./setup_part2.sh
    ```
 

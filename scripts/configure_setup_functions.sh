@@ -38,7 +38,7 @@ prompt_choice() {
   eval choice=\$$service_name
   if [ -z "$choice" ]; then
     while true; do
-      echo "$prompt_message (y/n)"
+      echo "$prompt_message (y|n)"
       read -r choice
       if [[ "$choice" =~ ^[YyNn]$ ]]; then
         break
@@ -113,7 +113,7 @@ prompt_drive() {
   eval drive_value=\$$drive_name
   if [ -z "$config_value" ] && [ -z "$drive_value" ]; then
     while true; do
-      echo "$prompt_message (y/n)"
+      echo "$prompt_message (y|n)"
       read -r choice
       if [[ "$choice" =~ ^[Yy]$ ]]; then
         echo "Please connect the drive you want to use and press [Enter] when ready."
@@ -149,7 +149,7 @@ prompt_drive() {
         echo "You selected: $target_drive"
         echo "Drive UUID: $drive_uuid"
         echo "Drive type: $drive_type"
-        echo "Please confirm: Is this the correct drive? (y/n)"
+        echo "Please confirm: Is this the correct drive? (y|n)"
         read -r confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
           # Write user's choice and drive to the config file

@@ -3,6 +3,9 @@
 # Define the configuration file path
 CONFIG_FILE="/home/$USER/n8n-supabase-pi/setup.conf"
 
+# Define the docker-compose file path
+DOCKER_COMPOSE_FILE="/home/$USER/n8n-supabase-pi/docker-compose.yml"
+
 # Load setup configuration from the file
 if [[ -f "$CONFIG_FILE" ]]; then
   source "$CONFIG_FILE"
@@ -100,9 +103,34 @@ else
     echo "Moving existing volumes to the mounted drive..."
     sudo mv /home/$USER/n8n-supabase-pi/volumes/* "$mount_point"
 
+    # Ensure Docker has correct permissions for all volumes
+    echo "Setting permissions for Docker to access the volumes..."
+    sudo chown -R $USER:$USER "$mount_point"
+
     # Update Docker Compose paths (assuming docker-compose.yml is in the same directory)
     echo "Updating Docker Compose volume paths to use the mounted drive..."
-    sed -i 's|./volumes|./mnt/database|g' /home/$USER/n8n-supabase-pi/docker-compose.yml
+    sed -i 's|./volumes|./mnt/database|g' "$DOCKER_COMPOSE_FILE"
+
+    # Remove the empty volumes folder
+    echo "Removing the empty volumes folder..."
+    rmdir /home/$USER/n8n-supabase-pi/volumes
+
+    # Create directories for Docker volumes on the mounted database drive
+    echo "Creating directories for Docker volumes on the mounted drive..."
+    sudo mkdir -p "$mount_point/db-config"
+    sudo mkdir -p "$mount_point/traefik_data"
+    sudo mkdir -p "$mount_point/n8n_data"
+
+    # Ensure proper permissions for Docker access
+    echo "Setting permissions for Docker to use the volume directories..."
+    sudo chown -R $USER:$USER "$mount_point/db-config"
+    sudo chown -R $USER:$USER "$mount_point/traefik_data"
+    sudo chown -R $USER:$USER "$mount_point/n8n_data"
+
+    # Replace the volumes section in docker-compose.yml with the mounted paths
+    echo "Updating Docker Compose volume paths to use the mounted drive..."
+    sed -i '/^volumes:/,/^[^[:space:]]/{//!d;};/^volumes:/a \
+  db-config:\n    driver: local\n    driver_opts:\n      type: none\n      device: '"$mount_point"'/db-config\n      o: bind\n  traefik_data:\n    driver: local\n    driver_opts:\n      type: none\n      device: '"$mount_point"'/traefik_data\n      o: bind\n  n8n_data:\n    driver: local\n    driver_opts:\n      type: none\n      device: '"$mount_point"'/n8n_data\n      o: bind' "$DOCKER_COMPOSE_FILE"
 
     # Update the setup.conf file
     sed -i '/^mounted_database_drive=/d' "$CONFIG_FILE"

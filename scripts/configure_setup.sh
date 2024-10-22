@@ -74,7 +74,6 @@ else
       fi
     done
     prompt_choice "install_portainer" "Do you want to install Portainer for managing Docker containers?"
-    prompt_choice "import_n8n_workflows" "Do you want to import the default n8n workflows?"
 
     # Display all user choices
     echo "*******************************************************************************"

@@ -36,8 +36,11 @@ else
         user_input="$current_value"
       fi
 
+      # Escape special characters in the user input
+      escaped_value=$(printf '%s\n' "$user_input" | sed -e 's/[\/&]/\\&/g')
+
       # Update the variable in the .env file
-      sed -i "s/^${var_name}=.*/${var_name}=${user_input}/" "$ENV_FILE"
+      sed -i "s|^${var_name}=.*|${var_name}=${escaped_value}|" "$ENV_FILE"
     else
       # Prompt the user for a new value if the variable doesn't exist
       read -p "${prompt_message}: " user_input
@@ -56,7 +59,7 @@ else
   # - n8n: https://docs.n8n.io/hosting/installation/server-setups/docker-compose/#6-create-env-file
   echo ""
   echo "[Supabase]"
-  prompt_env_var "POSTGRES_PASSWORD_NEW" "Should be at least 32 characters long with no special characters" "Enter the PostgreSQL password"
+  prompt_env_var "POSTGRES_PASSWORD" "Should be at least 32 characters long with no special characters" "Enter the PostgreSQL password"
   prompt_env_var "JWT_SECRET" "Should be at least 32 characters long with no special characters. Hold onto this one to generate next secrets." "Enter the JWT secret"
   prompt_env_var "ANON_KEY" "Use the JWT_SECRET to generate this anon key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the anonymous key"
   prompt_env_var "SERVICE_KEY" "Use the JWT_SECRET to generate this service key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the service key"
@@ -65,9 +68,7 @@ else
   echo ""
   echo "[n8n]"
   prompt_env_var "POSTGRES_HOST" "Database host n8n will use" "Enter database host or press [Enter] to keep default"
-  prompt_env_var "POSTGRES_DB" "Name of database for n8n" "Enter database name or press [Enter] to keep default"
   prompt_env_var "POSTGRES_PORT" "Port n8n will use for database access" "Enter port or press [Enter] to keep default"
-  prompt_env_var "POSTGRES_USER" "Username n8n will use for database access" "Enter username or press [Enter] to keep default"
   prompt_env_var "N8N_PORT" "Port to access n8n" "Enter port or press [Enter] to keep default"
   prompt_env_var "N8N_SECURE_COOKIE" "Require https connection to use n8n" "Enter 'true' or 'false' or press [Enter] to keep default"
   echo ""
