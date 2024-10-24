@@ -24,6 +24,7 @@ else
     # Prompt for services and configurations
     prompt_choice "install_argon_one" "Do you want to install Argon One PI 4 V2 Power Button & Fan Control?"
     prompt_choice "install_rpi_connect" "Do you want to install Raspberry Pi Connect?"
+    prompt_choice "install_portainer" "Do you want to install Portainer for managing Docker containers?"
     prompt_choice "install_fail2ban" "Do you want to install Fail2Ban for security?"
     if [ "$install_fail2ban" == "True" ]; then
       prompt_numerical_config "fail2ban_bantime" "Enter ban time in seconds for Fail2Ban (e.g., 1800 for 30 minutes, -1 for permanent):"
@@ -73,7 +74,6 @@ else
         break
       fi
     done
-    prompt_choice "install_portainer" "Do you want to install Portainer for managing Docker containers?"
 
     # Display all user choices
     echo "*******************************************************************************"
@@ -90,15 +90,16 @@ else
     echo "Are these choices correct? (y/n)"
     read -r confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      # Proceed with the setup since choices are confirmed
+      echo "Proceeding with setup..."
       break
     elif [[ "$confirm" =~ ^[Nn]$ ]]; then
-      # Clear the config file and prompt user again
+      # Clear the config file
       > "$CONFIG_FILE"
-      source "$CONFIG_FILE"
 
-      # Start over
+      # Restart the script
       echo "Configuration file cleared. Restarting the setup..."
-      prompt_all_services
+      exec "$0"
     else
       echo "Invalid input. Please enter 'y' or 'n'."
     fi

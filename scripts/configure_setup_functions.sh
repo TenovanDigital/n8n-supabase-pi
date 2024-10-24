@@ -120,15 +120,31 @@ prompt_drive() {
         read -r
 
         # Inform user that the drive will be formatted
-        echo "WARNING: The selected drive will be formatted. All data on it will be lost. Please make sure you select the correct drive."
+        echo "Running 'df -h' to show all mounted drives. Note that sometimes drives are automatically mounted."
         echo "*******************************************************************************"
         
-        # Display available drives
+        # Display mounted drives
         df -h
 
-        # Prompt user for the target drive
+        # Ask user if they see their drive
         echo "*******************************************************************************"
-        echo "Enter the filesystem name of the drive. Most external drives will be referenced under the '/dev/sd**' filesystem name:"
+        echo "Do you see your drive in the list above? (y|n)"
+        read -r drive_visible
+        if [[ "$drive_visible" =~ ^[Nn]$ ]]; then
+          echo "Running 'lsblk' to show all available drives. Note that the drive may not be mounted yet."
+          echo "*******************************************************************************"
+        
+          # Display available drives
+          lsblk
+
+          echo "*******************************************************************************"
+          echo "Drive names will be listed under 'NAME'. The drive should be officially named '/dev/NAME', so please use the whole name."
+        else
+          echo "Drive names will be listed under 'Filesystem'. Most external drives will be referenced under the '/dev/sd**' filesystem name."
+        fi
+
+        # Prompt user for the target drive
+        echo "Enter the name of the drive:"
         read -r target_drive
 
         # Run blkid command to get information about the drive

@@ -20,18 +20,20 @@ clean_up_config() {
   sed -i "/^install_exfat=/d" "$CONFIG_FILE"
 }
 
-# Function to check if a command is available
-check_command() {
+# Function to install a command if it is not available
+install_command() {
   if ! command -v "$1" &> /dev/null; then
-    echo "ERROR: $1 is not installed. Please install it and try again."
-    exit 1
+    echo "$1 is not installed. Installing..."
+    if ! sudo apt-get install -y "$1"; then
+      echo "ERROR: Failed to install $1. Please install it manually and try again."
+      exit 1
+    fi
   fi
 }
 
-# Check dependencies
-check_command jq
-check_command rsync
-check_command docker
+# Install dependencies
+install_command jq
+install_command rsync
 
 # Load setup configuration from the file
 if [[ -f "$CONFIG_FILE" ]]; then
@@ -125,8 +127,18 @@ else
     fi
 
     # If the device mounted automatically, we will need to unmount it temporarily.
-    if ! sudo umount "$database_drive"; then
-      echo "ERROR: Failed to unmount the drive."
+    if mount | grep -q "$database_drive"; then
+      if ! sudo umount "$database_drive"; then
+        echo "WARNING: Failed to unmount the drive. It might not be mounted, continuing..."
+      fi
+    else
+      echo "Drive is not mounted, continuing..."
+    fi
+
+    # Reload systemd to recognize the new fstab changes
+    echo "Reloading systemd to recognize fstab changes..."
+    if ! sudo systemctl daemon-reload; then
+      echo "ERROR: Failed to reload systemd daemon."
       exit 1
     fi
 
