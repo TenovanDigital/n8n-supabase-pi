@@ -41,9 +41,6 @@ The setup includes:
 
    ```sh
    sudo apt-get update
-   ```
-
-   ```sh
    sudo apt-get install git -y
    ```
 
@@ -51,9 +48,6 @@ The setup includes:
 
    ```sh
    git clone https://github.com/TenovanDigital/n8n-supabase-pi.git
-   ```
-
-   ```sh
    cd n8n-supabase-pi
    ```
 
@@ -62,9 +56,6 @@ The setup includes:
 
    ```sh
    chmod +x setup_part1.sh
-   ```
-
-   ```sh
    ./setup_part1.sh
    ```
 
@@ -85,9 +76,6 @@ The setup includes:
 
    ```sh
    cd n8n-supabase-pi
-   ```
-   
-   ```sh
    ./setup_part2.sh
    ```
 
@@ -103,6 +91,29 @@ The setup includes:
 - **n8n**: Once the setup is complete, n8n can be accessed at `http://<your-ip>:5678` or at the configured subdomain and domain.
 - **Supabase**: For database management, access Supabase at `http://<your-ip>:8000`.
 - **Portainer**: For Docker management, access Portainer at `http://<your-ip>:9000`.
+
+## How to Create Credentials to Connect n8n to Supabase
+
+This guide provides instructions on creating the credentials needed to connect n8n to Supabase nodes and Postgres nodes.
+
+### Supabase Account Credentials for n8n:
+- **Host**: `http://supabase-kong:8000`
+  - Use `supabase-kong` as the hostname to leverage Docker's internal DNS resolution.
+  - Alternatively, you can provide the Docker Container IP address of the supabase-kong container.
+  - Port 8000 is a port of supabase-kong.
+- **Service Role Secret**: `SUPABASE_ANON_KEY`
+  - Locate `SUPABASE_ANON_KEY` in the supabase-kong environment variables.
+
+### Postgres Account Credentials for n8n:
+- **Host**: `db`
+- **Database**: `postgres`
+- **User**: `postgres`
+- **Password**: `POSTGRES_PASSWORD`
+  - Locate `POSTGRES_PASSWORD` in the supabase-db environment variables.
+- **Ignore SSL Issues**: `False`
+- **SSL**: `Disable`
+- **Port**: `5432`
+- **SSH Tunnel**: `False`
 
 ## Contributing
 

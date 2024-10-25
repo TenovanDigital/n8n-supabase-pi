@@ -14,9 +14,7 @@ else
   # Install Uncomplicated Firewall (UFW) and enable it
   sudo apt-get install -y ufw
   sudo ufw allow ssh
-  # Allow port 5678 for n8n
-  sudo ufw allow 5678
-  # Allow ports 80 and 443 for traefik
+  # Allow ports 80 and 443 for traefik proxy
   sudo ufw allow 80
   sudo ufw allow 443
 

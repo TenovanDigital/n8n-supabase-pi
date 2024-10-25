@@ -32,6 +32,9 @@ fi
 # Verify Docker installation and that the user has been added to docker group
 . /home/$USER/n8n-supabase-pi/scripts/verify_docker.sh
 
+# Install Traefik proxy
+. /home/$USER/n8n-supabase-pi/scripts/install_traefik.sh
+
 # Install Portainer (our Web interface for Docker management)
 if [ "$install_portainer" == "True" ]; then
   . /home/$USER/n8n-supabase-pi/scripts/install_portainer.sh

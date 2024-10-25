@@ -3,6 +3,10 @@ volumes:
   traefik_data:
   n8n_data:
 
+networks:
+  traefik:
+    external: true
+
 services:
   studio:
     container_name: supabase-studio
@@ -65,11 +69,28 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
-      DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
-      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      DASHBOARD_USERNAME: ${SUPABASE_USERNAME}
+      DASHBOARD_PASSWORD: ${SUPABASE_PASSWORD}
     volumes:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.supabase-kong.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/supabase`) && !PathPrefix(`/supabase/analytics`)
+      - traefik.http.routers.supabase-kong.tls=true
+      - traefik.http.routers.supabase-kong.entrypoints=web,websecure
+      - traefik.http.routers.supabase-kong.tls.certresolver=myresolver
+      - traefik.http.middlewares.supabase-kong.headers.SSLRedirect=true
+      - traefik.http.middlewares.supabase-kong.headers.STSSeconds=315360000
+      - traefik.http.middlewares.supabase-kong.headers.browserXSSFilter=true
+      - traefik.http.middlewares.supabase-kong.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.supabase-kong.headers.forceSTSHeader=true
+      - traefik.http.middlewares.supabase-kong.headers.SSLHost=${DOMAIN_NAME}
+      - traefik.http.middlewares.supabase-kong.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.supabase-kong.headers.STSPreload=true
+      - traefik.http.routers.supabase-kong.middlewares=supabase-kong@docker
+    networks:
+      - traefik
 
   auth:
     container_name: supabase-auth
@@ -323,6 +344,23 @@ services:
       interval: 5s
       retries: 10
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.supabase-analytics.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/supabase/analytics`)
+      - traefik.http.routers.supabase-analytics.tls=true
+      - traefik.http.routers.supabase-analytics.entrypoints=web,websecure
+      - traefik.http.routers.supabase-analytics.tls.certresolver=myresolver
+      - traefik.http.middlewares.supabase-analytics.headers.SSLRedirect=true
+      - traefik.http.middlewares.supabase-analytics.headers.STSSeconds=315360000
+      - traefik.http.middlewares.supabase-analytics.headers.browserXSSFilter=true
+      - traefik.http.middlewares.supabase-analytics.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.supabase-analytics.headers.forceSTSHeader=true
+      - traefik.http.middlewares.supabase-analytics.headers.SSLHost=${DOMAIN_NAME}
+      - traefik.http.middlewares.supabase-analytics.headers.STSIncludeSubdomains=true
+      - traefik.http.middlewares.supabase-analytics.headers.STSPreload=true
+      - traefik.http.routers.supabase-analytics.middlewares=supabase-analytics@docker
+    networks:
+      - traefik
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -469,29 +507,6 @@ services:
       - POOLER_POOL_MODE=transaction
     volumes:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
-
-  traefik:
-    container_name: traefik
-    image: "traefik"
-    restart: always
-    command:
-      - "--api=true"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
-      - "--certificatesresolvers.mytlschallenge.acme.email=${SSL_EMAIL}"
-      - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - traefik_data:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
   
   n8n:
     container_name: n8n
@@ -499,10 +514,10 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.n8n.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)
+      - traefik.http.routers.n8n.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`) && PathPrefix(`/n8n`)
       - traefik.http.routers.n8n.tls=true
       - traefik.http.routers.n8n.entrypoints=web,websecure
-      - traefik.http.routers.n8n.tls.certresolver=mytlschallenge
+      - traefik.http.routers.n8n.tls.certresolver=myresolver
       - traefik.http.middlewares.n8n.headers.SSLRedirect=true
       - traefik.http.middlewares.n8n.headers.STSSeconds=315360000
       - traefik.http.middlewares.n8n.headers.browserXSSFilter=true
@@ -524,7 +539,7 @@ services:
       - N8N_PROTOCOL=https
       - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE}
       - NODE_ENV=production
-      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}
+      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/n8n
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
     ports:
       - ${N8N_PORT}:${N8N_PORT}
@@ -533,3 +548,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - traefik

@@ -63,8 +63,8 @@ else
   prompt_env_var "JWT_SECRET" "Should be at least 32 characters long with no special characters. Hold onto this one to generate next secrets." "Enter the JWT secret"
   prompt_env_var "ANON_KEY" "Use the JWT_SECRET to generate this anon key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the anonymous key"
   prompt_env_var "SERVICE_KEY" "Use the JWT_SECRET to generate this service key using the form here: https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys" "Enter the service key"
-  prompt_env_var "DASHBOARD_USERNAME" "Credential for you to log into Supabase" "Enter username"
-  prompt_env_var "DASHBOARD_PASSWORD" "Credential for you to log into Supabase" "Enter password"
+  prompt_env_var "SUPABASE_USERNAME" "Credential for you to log into your Supabase dashboard" "Enter username"
+  prompt_env_var "SUPABASE_PASSWORD" "Credential for you to log into your Supabase dashboard" "Enter password"
   echo ""
   echo "[n8n]"
   prompt_env_var "POSTGRES_HOST" "Database host n8n will use" "Enter database host or press [Enter] to keep default"
@@ -77,6 +77,8 @@ else
   prompt_env_var "SUBDOMAIN" "The subdomain to serve n8n from" "Enter the subdomain"
   prompt_env_var "SSL_EMAIL" "The email address to use for the SSL certificate creation" "Enter the email address"
   prompt_env_var "GENERIC_TIMEZONE" "Optional timezone to set which gets used by Cron-Node by default" "Enter timezone"
+  prompt_env_var "TRAEFIK_USERNAME" "Credential for you to log into your Traefik dashboard" "Enter username"
+  prompt_env_var "TRAEFIK_PASSWORD" "Credential for you to log into your Traefik dashboard" "Enter password"
 
   # Confirmation message
   echo ""

@@ -11,11 +11,40 @@ fi
 if [ "$installed_portainer" == "True" ]; then
   echo "Portainer is already installed."
 elif [ "$installed_docker" == "True" ]; then
+  # Ensure the traefik network exists
+  if ! sudo docker network ls | grep -q "traefik"; then
+    echo "Traefik network not found. Creating traefik network..."
+    sudo docker network create traefik
+  fi
+
   # Install Portainer (our Web interface for Docker management)
   sudo docker pull portainer/portainer-ce:latest
 
-  # Start up Portainer
-  sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+  # Start up Portainer with Traefik labels
+  sudo docker run -d \
+    --name portainer \
+    --restart always \
+    -p 9000:9000 \
+    -p 9443:9443 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    --network traefik \
+    -l "traefik.enable=true" \
+    -l "traefik.http.routers.portainer.rule=Host(\`${SUBDOMAIN}.${DOMAIN_NAME}\`) && PathPrefix(\`/portainer\`)" \
+    -l "traefik.http.routers.portainer.tls=true" \
+    -l "traefik.http.routers.portainer.entrypoints=websecure" \
+    -l "traefik.http.routers.portainer.tls.certresolver=myresolver" \
+    -l "traefik.http.middlewares.portainer.headers.SSLRedirect=true" \
+    -l "traefik.http.middlewares.portainer.headers.STSSeconds=315360000" \
+    -l "traefik.http.middlewares.portainer.headers.browserXSSFilter=true" \
+    -l "traefik.http.middlewares.portainer.headers.contentTypeNosniff=true" \
+    -l "traefik.http.middlewares.portainer.headers.forceSTSHeader=true" \
+    -l "traefik.http.middlewares.portainer.headers.SSLHost=${DOMAIN_NAME}" \
+    -l "traefik.http.middlewares.portainer.headers.STSIncludeSubdomains=true" \
+    -l "traefik.http.middlewares.portainer.headers.STSPreload=true" \
+    -l "traefik.http.routers.portainer.middlewares=portainer@docker" \
+    -l "traefik.http.services.portainer.loadbalancer.server.port=9000" \
+    portainer/portainer-ce:latest
 
   # Get the local IP address of the Raspberry Pi
   LOCAL_IP=$(hostname -I | awk '{print $1}')

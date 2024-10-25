@@ -191,3 +191,12 @@ prompt_drive() {
     fi
   fi
 }
+
+# Function to clean up setup configuration
+clean_up_drive_config() {
+  sed -i "/^mount_database_drive=/d" "$CONFIG_FILE"
+  sed -i "/^database_drive=/d" "$CONFIG_FILE"
+  sed -i "/^database_drive_uuid=/d" "$CONFIG_FILE"
+  sed -i "/^database_drive_type=/d" "$CONFIG_FILE"
+  sed -i "/^format_database_drive=/d" "$CONFIG_FILE"
+}

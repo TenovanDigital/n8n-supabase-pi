@@ -9,17 +9,6 @@ DOCKER_COMPOSE_FILE="/home/$USER/n8n-supabase-pi/docker-compose.yml"
 # Define Docker daemon config path
 DOCKER_DAEMON_CONFIG="/etc/docker/daemon.json"
 
-# Function to clean up setup configuration
-clean_up_config() {
-  sed -i "/^mount_database_drive=/d" "$CONFIG_FILE"
-  sed -i "/^database_drive=/d" "$CONFIG_FILE"
-  sed -i "/^database_drive_uuid=/d" "$CONFIG_FILE"
-  sed -i "/^database_drive_type=/d" "$CONFIG_FILE"
-  sed -i "/^format_database_drive=/d" "$CONFIG_FILE"
-  sed -i "/^install_ntfs=/d" "$CONFIG_FILE"
-  sed -i "/^install_exfat=/d" "$CONFIG_FILE"
-}
-
 # Function to install a command if it is not available
 install_command() {
   if ! command -v "$1" &> /dev/null; then
@@ -57,26 +46,10 @@ else
         echo "It is recommended to format the database drive to the 'ext4' format prior to mounting it."
         echo "WARNING: This means ALL data on it will be erased!"
         prompt_choice "format_database_drive" "Do you want to format the drive?"
-        if [ "$format_database_drive" == "False" ] && [ "$database_drive_type" == "ntfs" ]; then
-          echo "Since the drive is using the 'ntfs' format, we will need to install the NTFS-3g driver."
-          prompt_choice "install_ntfs" "Do you want to install the NTFS-3g driver?"
-          if [ "$install_ntfs" == "False" ]; then
-            echo "Without the NTFS-3g driver, this device won't be able to use this drive. Please try again."
-            clean_up_config
-            continue
-          else
-            break
-          fi
-        elif [ "$format_database_drive" == "False" ] && [ "$database_drive_type" == "exFAT" ]; then
-          echo "Since the drive is using the 'exFAT' format, we will need to install the exFAT filesystem driver."
-          prompt_choice "install_exfat" "Do you want to install the exFAT filesystem driver?"
-          if [ "$install_exfat" == "False" ]; then
-            echo "Without the exfat filesystem driver, this device won't be able to use this drive. Please try again."
-            clean_up_config
-            continue
-          else
-            break
-          fi
+        if [ "$format_database_drive" == "False" ]; then
+          echo "Without formatting this drive, this device won't be able to use it. Please try again."
+          clean_up_drive_config
+          continue
         else
           break
         fi
@@ -91,7 +64,7 @@ else
     if [ "$format_database_drive" == "True" ]; then
       # Format the database drive
       echo "Formatting database drive..."
-      if ! sudo mkfs.ext4 "$database_drive"; then
+      if ! sudo mkfs.ext4 -F "$database_drive"; then
         echo "ERROR: Failed to format the drive."
         exit 1
       fi
@@ -181,6 +154,13 @@ else
     echo "Copying Docker data to new location..."
     if ! sudo rsync -aP /var/lib/docker/ "$mount_point/docker"; then
       echo "ERROR: Failed to copy Docker data."
+      exit 1
+    fi
+
+    # Give the user ownership of the Docker data location and set Docker permissions
+    echo "Giving $USER ownership of $mount_point/docker and setting permissions for Docker..."
+    if ! sudo chown -R "$USER":"$USER" "$mount_point/docker"; then
+      echo "ERROR: Failed to set ownership and permissions for $mount_point/docker."
       exit 1
     fi
 
